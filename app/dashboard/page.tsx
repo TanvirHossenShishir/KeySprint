@@ -114,7 +114,7 @@ const Dashboard = () => {
                   ${
                     isCaret
                       ? isCharRight
-                        ? "border-blue-500"
+                        ? "border-yellow-500"
                         : "border-red-500"
                       : ""
                   }
@@ -127,11 +127,6 @@ const Dashboard = () => {
 
                 return (
                   <div className={charClassName} key={charIndex}>
-                    {/* {isCaret && (
-                      <div className="text-blue-500 text-3xl absolute -top-2 -left-1">
-                        *
-                      </div>
-                    )} */}
 
                     {hasOtherCaret && (
                       <div className="text-red-500 text-2xl absolute -top-3 -left-2 rotate-180">
