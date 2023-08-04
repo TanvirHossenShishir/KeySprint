@@ -15,7 +15,7 @@ const Dashboard = () => {
   const currentWord = words[currentIndex];
 
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
       event.preventDefault();
 
@@ -61,7 +61,7 @@ const Dashboard = () => {
     setIsInputFocused(false);
   };
 
-  const [otherCaretPositions, setOtherCaretPositions] = useState<number[][]>([
+  const [otherCaretPositions, setOtherCaretPositions] = useState([
     [0, 0],
     [0, 0],
     [0, 0],
