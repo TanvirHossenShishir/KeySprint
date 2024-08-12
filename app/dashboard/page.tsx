@@ -120,16 +120,56 @@ const Dashboard = () => {
                   }
                 `;
 
-                const hasOtherCaret =
-                  otherCaretPositions.find(
-                    ([row, col]) => row === index && col === charIndex
-                  ) !== undefined;
+                // const hasOtherCaret =
+                //   otherCaretPositions.find(
+                //     ([row, col]) => row === index && col === charIndex
+                //   ) !== undefined;
+
+
+                const u1 =
+                  otherCaretPositions[0][0] === index &&
+                  otherCaretPositions[0][1] === charIndex;
+                const u2 =
+                  otherCaretPositions[1][0] === index &&
+                  otherCaretPositions[1][1] === charIndex;
+                const u3 =
+                  otherCaretPositions[2][0] === index &&
+                  otherCaretPositions[2][1] === charIndex;
+                const u4 =
+                  otherCaretPositions[3][0] === index &&
+                  otherCaretPositions[3][1] === charIndex;
+                const u5 =
+                  otherCaretPositions[4][0] === index &&
+                  otherCaretPositions[4][1] === charIndex;
 
                 return (
                   <div className={charClassName} key={charIndex}>
-
-                    {hasOtherCaret && (
+                    {u1 && (
                       <div className="text-red-500 text-2xl absolute -top-3 -left-2 rotate-180">
+                        ^
+                      </div>
+                    )}
+
+                    {u2 && (
+                      <div className="text-blue-500 text-2xl absolute -top-3 -left-2 rotate-180">
+                        ^
+                      </div>
+                    )}
+
+                    {u3 && (
+                      <div className="text-green-500 text-2xl absolute -top-3 -left-2 rotate-180">
+                        ^
+                      </div>
+                    )}
+
+                    {u4 && (
+                      <div className="text-yellow-500 text-2xl absolute -top-3 -left-2 rotate-180">
+                        ^
+                      </div>
+                    )}
+
+                    {u5 && (
+                      <div className="text-violet-500 text-2xl absolute -top-3 -left-2 rotate-180">
                         ^
                       </div>
                     )}
@@ -145,7 +185,7 @@ const Dashboard = () => {
         <input
           className={`${
             isInputFocused ? "opacity-0" : "opacity-80 bg-neutral-200 blur-4xl"
-          } w-10/12 h-36 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
+          } w-10/12 h-48 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
           type="text"
           value={userInput}
           onChange={handleChange}
