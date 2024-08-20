@@ -1,13 +1,17 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  reactStrictMode: true,
-  webpack: (config) => {
-    config.externals.push({
-      "utf-8-validate": "commonjs utf-8-validate",
-      bufferutil: "commonjs bufferutil",
-    });
-
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ["mongoose"],
+  },
+  images: {
+    domains: ["lh3.googleusercontent.com"],
+  },
+  webpack(config) {
+    config.experiments = {
+      ...config.experiments,
+      topLevelAwait: true,
+    };
     return config;
   },
 };
