@@ -10,14 +10,11 @@ export const connectToDB = async () => {
     return;
   }
 
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    throw new Error("MONGODB_URI environment variable is not defined");
-  }
-
   try {
-    await mongoose.connect(uri, {
-      dbName: "keysprint",
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: "keysprintdb",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
 
     isConnected = true;

@@ -1,16 +1,13 @@
-import { NextApiResponseServerIO } from "@/types/next";
-import { NextApiRequest } from "next";
+const allMessage = {};
 
-const allMessage: Record<string, number> = {};
-
-const server = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
+const server = async (req, res) => {
   if (req.method === "POST") {
     // get message
     const message = req.body;
 
     allMessage[message.userId] = message.message;
 
-    // console.log(allMessage["SunnyDog"]);
+    // log all messages
     for (const userId in allMessage) {
       console.log(`${userId}: ${allMessage[userId]}`);
     }

@@ -4,11 +4,11 @@ import GoogleProvider from "next-auth/providers/google";
 import User from "@/models/user";
 import { connectToDB } from "@/lib/database";
 
-const handler = NextAuth({
+export default NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
   callbacks: {
@@ -43,5 +43,3 @@ const handler = NextAuth({
     },
   },
 });
-
-export { handler as GET, handler as POST };

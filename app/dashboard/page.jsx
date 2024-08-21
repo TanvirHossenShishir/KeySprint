@@ -1,20 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, KeyboardEvent, ChangeEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { io as ClientIO } from "socket.io-client";
 import { words } from "./words.json";
 
-interface IServerMessage {
-  userId: string;
-  message: [number, number];
-}
-
 const Dashboard = () => {
-  const [connected, setConnected] = useState<boolean>(false);
+  const [connected, setConnected] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [matchingChars, setMatchingChars] = useState<number>(0);
-  const [matchingWords, setMatchingWords] = useState<number>(0);
+  const [matchingChars, setMatchingChars] = useState(0);
+  const [matchingWords, setMatchingWords] = useState(0);
   const [isCharRight, setIsCharRight] = useState(true);
   const currentWord = words[currentIndex];
   const [currentCaretPosition, setCurrentCaretPosition] = useState([0, 0]);
@@ -39,7 +34,7 @@ const Dashboard = () => {
   const [input, setInput] = useState("");
 
   // dispatch message to other users by server
-  const sendApiSocket = async (Message: IServerMessage): Promise<Response> => {
+  const sendApiSocket = async (Message) => {
     return await fetch("/api/socket/server", {
       method: "POST",
       headers: {
@@ -50,7 +45,7 @@ const Dashboard = () => {
   };
 
   const sendMessage = async () => {
-    const Message: IServerMessage = {
+    const Message = {
       userId: username,
       message: [currentIndex, matchingChars],
     };
@@ -63,8 +58,8 @@ const Dashboard = () => {
     }
   };
 
-  useEffect((): any => {
-    const socket = new (ClientIO as any)(process.env.BASE_URL, {
+  useEffect(() => {
+    const socket = ClientIO(process.env.BASE_URL, {
       path: "/api/socket/io",
       addTrailingSlash: false,
     });
@@ -76,7 +71,7 @@ const Dashboard = () => {
     });
 
     // update client on new message dispatched from server
-    socket.on("message", (message: Record<string, [number, number]>) => {
+    socket.on("message", (message) => {
       console.log("Received message:", message);
 
       // Extract the array of caret positions from the message object
@@ -87,20 +82,20 @@ const Dashboard = () => {
       setOtherCaretPositions(extractedCaretPositions);
     });
 
-    // socket disconnet onUnmount if exists
-    if (socket) return () => socket.disconnect();
+    // socket disconnect on unmount if exists
+    return () => {
+      if (socket) socket.disconnect();
+    };
   }, []);
 
-  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (e) => {
     setInput(e.target.value);
     sendMessage();
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = (event) => {
     if (event.key === "Backspace") {
       event.preventDefault();
-
-      // setCurrentCaretPosition(([row, col]) => [row, Math.max(0, col - 1)]);
 
       setMatchingChars((prevMatchingChars) =>
         Math.max(0, prevMatchingChars - 1)
@@ -113,7 +108,7 @@ const Dashboard = () => {
     sendMessage();
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event) => {
     const value = event.target.value;
 
     if (value[matchingChars] === currentWord[matchingChars]) {
@@ -192,9 +187,6 @@ const Dashboard = () => {
         })}
 
         <input
-          // className={`${
-          //   isInputFocused ? "opacity-0" : "opacity-80 bg-neutral-200 blur-4xl"
-          // } w-10/12 h-36 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
           className={`${
             isInputFocused ? "opacity-0" : "opacity-0"
           } w-10/12 h-36 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}

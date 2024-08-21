@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/hello.page.tsx"
-  ],
+, "components/Nav.jsx", "components/Provider.jsx", "app/layout.jsx", "app/page.jsx", "app/dashboard/page.jsx", "lib/database.jsx", "lib/utils.jsx", "models/user.jsx", "pages/api/auth/[...nextauth].jsx", "pages/api/socket/io.jsx", "pages/api/socket/server.jsx", "types/next.tsx"  ],
   "exclude": ["node_modules"]
 }
