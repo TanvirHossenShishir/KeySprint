@@ -12,10 +12,10 @@ const RootLayout = ({ children }) => (
   <html lang="en">
     <body>
       <Provider>
-        <main>
+        <div className="">
           <Nav />
           {children}
-        </main>
+        </div>
       </Provider>
     </body>
   </html>
