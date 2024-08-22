@@ -8,6 +8,39 @@
   Note: The styles for this gradient grid background is heavily inspired by the creator of this amazing site (https://dub.sh) – all credits go to them! 
 */
 
+.bg_dark {
+  background-color: #212122;
+}
+
+.bg_light {
+  background-color: #303034;
+}
+
+.cl_gray {
+  color: #d1d0d4;
+}
+
+.cl_pink {
+  color: #ED6A5E;
+}
+
+.cl_orange {
+  color: #fb932c;
+}
+
+.cl_blue {
+  color: #3b82f6;
+}
+
+.cl_violet {
+  color: #8b5cf6;
+}
+
+.cl_teal {
+  color: #14b8a6;
+}
+
+
 .main {
   width: 100vw;
   min-height: 100vh;
@@ -78,7 +111,7 @@
 }
 
 .black_btn {
-  @apply rounded-full border border-black bg-black py-1.5 px-5 text-white transition-all hover:bg-white hover:text-black text-center text-sm font-inter flex items-center justify-center;
+  @apply rounded-full border border-black bg_light py-1.5 px-5 text-white transition-all hover:bg-white hover:text-black text-center text-sm font-inter flex items-center justify-center;
 }
 
 .outline_btn {
@@ -137,7 +170,7 @@
 
 /* Nav Component */
 .logo_text {
-  @apply max-sm:hidden font-satoshi font-semibold text-lg text-black tracking-wide;
+  @apply max-sm:hidden font-satoshi font-semibold text-xl text-white tracking-wide;
 }
 
 .dropdown {

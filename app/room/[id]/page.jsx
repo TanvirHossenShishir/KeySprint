@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { io as ClientIO } from "socket.io-client";
-import { words } from "./words.json";
+import { words } from "../words.json";
 
-const Dashboard = () => {
+const Dashboard = ({ params }) => {
   const [connected, setConnected] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -138,24 +138,30 @@ const Dashboard = () => {
     setIsInputFocused(false);
   };
 
+  var isRoomValid = () => {
+    if (params.id == "1" || params.id == "2") return true;
+    else return false;
+  }
+
   return (
     <div className="flex justify-center items-start h-screen bg-neutral-200">
-      <div className="flex flex-wrap py-44 w-10/12">
-        {words.map((word, index) => {
-          const isCurrentWord = index === currentIndex;
-          const alreadyTyped = index < matchingWords;
-          return (
-            <div className="p-1 h-12 w-fit flex text-neutral-500" key={index}>
-              {word.split("").map((char, charIndex) => {
-                const isMatching = charIndex < matchingChars;
-                const isCaret = isCurrentWord && charIndex === matchingChars;
-                const charClassName = `relative flex items-center text-xl font-medium border-l-2 ${
-                  isCurrentWord || alreadyTyped
-                    ? isMatching || alreadyTyped
-                      ? "text-neutral-900"
+      {isRoomValid() ? (
+        <div className="flex flex-wrap py-44 w-10/12">
+          {words.map((word, index) => {
+            const isCurrentWord = index === currentIndex;
+            const alreadyTyped = index < matchingWords;
+            return (
+              <div className="p-1 h-12 w-fit flex text-neutral-500" key={index}>
+                {word.split("").map((char, charIndex) => {
+                  const isMatching = charIndex < matchingChars;
+                  const isCaret = isCurrentWord && charIndex === matchingChars;
+                  const charClassName = `relative flex items-center text-xl font-medium border-l-2 ${
+                    isCurrentWord || alreadyTyped
+                      ? isMatching || alreadyTyped
+                        ? "text-neutral-900"
+                        : ""
                       : ""
-                    : ""
-                } 
+                  } 
                   ${
                     isCaret
                       ? isCharRight
@@ -165,40 +171,43 @@ const Dashboard = () => {
                   }
                 `;
 
-                const hasOtherCaret =
-                  otherCaretPositions.find(
-                    ([row, col]) => row === index && col === charIndex
-                  ) !== undefined;
+                  const hasOtherCaret =
+                    otherCaretPositions.find(
+                      ([row, col]) => row === index && col === charIndex
+                    ) !== undefined;
 
-                return (
-                  <div className={charClassName} key={charIndex}>
-                    {hasOtherCaret && (
-                      <div className="text-red-500 text-2xl absolute -top-3 -left-2 rotate-180">
-                        ^
-                      </div>
-                    )}
+                  return (
+                    <div className={charClassName} key={charIndex}>
+                      {hasOtherCaret && (
+                        <div className="text-red-500 text-2xl absolute -top-3 -left-2 rotate-180">
+                          ^
+                        </div>
+                      )}
 
-                    {char}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+                      {char}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
 
-        <input
-          className={`${
-            isInputFocused ? "opacity-0" : "opacity-0"
-          } w-10/12 h-36 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
-          type="text"
-          value={userInput}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
-          placeholder="Click here to start typing"
-        />
-      </div>
+          <input
+            className={`${
+              isInputFocused ? "opacity-0" : "opacity-0"
+            } w-10/12 h-36 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
+            type="text"
+            value={userInput}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
+            placeholder="Click here to start typing"
+          />
+        </div>
+      ) : (
+        <div>This is not a valid room.</div>
+      )}
     </div>
   );
 };

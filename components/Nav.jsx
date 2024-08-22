@@ -20,7 +20,7 @@ const Nav = () => {
   }, []);
 
   return (
-    <nav className='flex-between w-full h-24 p-5'>
+    <nav className='flex-between w-full h-24 py-5 bg_dark px-28'>
       <Link href='/' className='flex gap-2 flex-center'>
         <Image
           src='/assets/images/logo.svg'
@@ -29,11 +29,11 @@ const Nav = () => {
           height={30}
           className='object-contain'
         />
-        <p className='logo_text'>Keysprint</p>
+        <p className='logo_text'>keysprint</p>
       </Link>
 
 
-      <Link href="/leaderboard" className="flex gap-2 logo_text">Leaderboard</Link>
+      <Link href="/leaderboard" className="flex gap-2 bg_light p-2 rounded-3xl logo_text">Leaderboard</Link>
 
 
       {/* Desktop Navigation */}
