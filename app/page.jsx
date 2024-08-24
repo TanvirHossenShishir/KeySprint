@@ -14,7 +14,7 @@ const Home = () => {
     <div className="bg_dark h-screen px-28 py-10">
       <div className="flex text-center text-white gap-5 h-64">
         <Link
-          href="/room"
+          href="/room/9"
           className="flex-1 rounded-3xl pt-10 bg_light"
         >
           <div className="flex justify-center text-6xl pb-3 cl_orange">
@@ -30,7 +30,7 @@ const Home = () => {
           <p className="text-4xl font-medium">Quick Play</p>
           <p className="text-lg font-normal m-3 cl_gray">Play against others</p>
         </Link>
-        <Link href={getRoomID()} className="flex-1 rounded-3xl pt-10 bg_light">
+        <Link href="/room/1" className="flex-1 rounded-3xl pt-10 bg_light">
           <div className="flex justify-center text-6xl pb-3 cl_pink">
             <TiGroupOutline />
           </div>

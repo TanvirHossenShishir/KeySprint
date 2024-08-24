@@ -1,10 +1,69 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { io as ClientIO } from "socket.io-client";
-import { words } from "../words.json";
+let socket;
+import React, { useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
+import { words } from "../../../app/words.json";
 
-const Dashboard = ({ params }) => {
+const Room = ({ params }) => {
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
+  const socketInitialized = useRef(false);
+  const [roomJoined, setRoomJoined] = useState(false);
+
+  useEffect(() => {
+    if (!socketInitialized.current) {
+      socketInitializer().then(() => {
+        if (params.id) {
+          setRoom(params.id);
+        }
+      });
+      socketInitialized.current = true;
+    }
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+  async function socketInitializer() {
+    if (socket) return;
+
+    await fetch("/api/socket/ioserver");
+    socket = io();
+
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("receive-message", (message) => {
+      console.log("Received message:", message);
+
+      const extractedCaretPositions = Object.values(message);
+      console.log("Extracted:", extractedCaretPositions);
+
+      setOtherCaretPositions(extractedCaretPositions);
+    });
+  }
+
+  useEffect(() => {
+    if (room && !roomJoined && socket) {
+      handleJoinRoom();
+    }
+  }, [room, socket]);
+
+  function handleJoinRoom() {
+    if (room && !roomJoined) {
+      console.log("Joining room:", room);
+      socket.emit("join-room", room, () => {
+        console.log("Room joined successfully");
+        setRoomJoined(true);
+      });
+    }
+  }
+
   const [connected, setConnected] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,8 +77,6 @@ const Dashboard = ({ params }) => {
     [0, 0],
   ]);
 
-  const [username, setUsername] = useState("");
-
   useEffect(() => {
     const adjectives = ["Happy", "Funny", "Sunny", "Silly", "Clever", "Brave"];
     const nouns = ["Cat", "Dog", "Tiger", "Lion", "Elephant", "Kangaroo"];
@@ -31,66 +88,18 @@ const Dashboard = ({ params }) => {
     setUsername(randomUsername);
   }, []);
 
-  const [input, setInput] = useState("");
-
-  // dispatch message to other users by server
-  const sendApiSocket = async (Message) => {
-    return await fetch("/api/socket/server", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(Message),
-    });
-  };
-
-  const sendMessage = async () => {
+  const sendMessage = () => {
     const Message = {
       userId: username,
       message: [currentIndex, matchingChars],
     };
 
-    const resp = await sendApiSocket(Message);
-    if (!resp.ok) {
-      setTimeout(() => {
-        sendMessage();
-      }, 500);
+    if (socket) {
+      socket.emit("send-message", {
+        Message,
+        room,
+      });
     }
-  };
-
-  useEffect(() => {
-    const socket = ClientIO(process.env.BASE_URL, {
-      path: "/api/socket/io",
-      addTrailingSlash: false,
-    });
-
-    // log socket connection
-    socket.on("connect", () => {
-      console.log("SOCKET CONNECTED!", socket.id);
-      setConnected(true);
-    });
-
-    // update client on new message dispatched from server
-    socket.on("message", (message) => {
-      console.log("Received message:", message);
-
-      // Extract the array of caret positions from the message object
-      const extractedCaretPositions = Object.values(message);
-      console.log("Extracted:", extractedCaretPositions);
-
-      // Update the otherCaretPositions state
-      setOtherCaretPositions(extractedCaretPositions);
-    });
-
-    // socket disconnect on unmount if exists
-    return () => {
-      if (socket) socket.disconnect();
-    };
-  }, []);
-
-  const onChangeHandler = (e) => {
-    setInput(e.target.value);
-    sendMessage();
   };
 
   const handleKeyDown = (event) => {
@@ -126,6 +135,7 @@ const Dashboard = ({ params }) => {
       setMatchingChars(0);
       setMatchingWords((prevMatchingWords) => prevMatchingWords + 1);
     }
+    sendMessage();
   };
 
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -139,9 +149,10 @@ const Dashboard = ({ params }) => {
   };
 
   var isRoomValid = () => {
-    if (params.id == "1" || params.id == "2") return true;
-    else return false;
-  }
+    if (params.id >= "1" && params.id <= "9") {
+      return true;
+    } else return false;
+  };
 
   return (
     <div className="flex justify-center items-start h-screen bg-neutral-200">
@@ -172,9 +183,13 @@ const Dashboard = ({ params }) => {
                 `;
 
                   const hasOtherCaret =
-                    otherCaretPositions.find(
-                      ([row, col]) => row === index && col === charIndex
-                    ) !== undefined;
+                    otherCaretPositions.find((pos) => {
+                      if (Array.isArray(pos) && pos.length === 2) {
+                        const [row, col] = pos;
+                        return row === index && col === charIndex;
+                      }
+                      return false;
+                    }) !== undefined;
 
                   return (
                     <div className={charClassName} key={charIndex}>
@@ -212,4 +227,4 @@ const Dashboard = ({ params }) => {
   );
 };
 
-export default Dashboard;
+export default Room;
