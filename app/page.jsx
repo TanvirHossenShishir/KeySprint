@@ -11,7 +11,7 @@ const Home = () => {
   }
 
   return (
-    <div className="bg_dark h-screen px-28 py-10">
+    <div className="bg_dark h-screen px-28 py-5">
       <div className="flex text-center text-white gap-5 h-64">
         <Link
           href="/room/9"
