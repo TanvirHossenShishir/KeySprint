@@ -1,9 +1,24 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 
 const Deck = () => {
-  var getRoomID = () => {
-    var id = "dashboard";
-    return id;
+
+  const getRoomID = () => "1";
+
+  const [isPuncOn, setIsPuncOn] = useState(false);
+  const [isNumbOn, setIsNumbOn] = useState(false);
+
+  const handlePunctuation = () => {
+    setIsPuncOn(!isPuncOn);
+  };
+
+  const handleNumber = () => {
+    setIsNumbOn(!isNumbOn);
+  };
+
+  const handleStartGame = () => {
+    const roomId = getRoomID();
   };
 
   return (
@@ -18,15 +33,35 @@ const Deck = () => {
             />
           </div>
 
-          <p className="text-lg font-normal mt-3 cl_gray">
-            Punctuation: ON / OFF
-          </p>
+          <div className="flex mt-2 gap-3">
+            <p className="cl_gray text-lg pl-1 py-1">Mode: </p>
+
+            <button
+              onClick={handlePunctuation}
+              className={`bg-zinc-800 text-xs px-2 rounded-lg ${
+                isPuncOn ? "bg_blue" : "bg-zinc-800 cl_gray"
+              }`}
+            >
+              PUNCTUATION
+            </button>
+            <button
+              onClick={handleNumber}
+              className={`bg-zinc-800 text-xs px-2 rounded-lg ${
+                isNumbOn ? "bg_blue" : "bg-zinc-800 cl_gray"
+              }`}
+            >
+              NUMBER
+            </button>
+          </div>
         </div>
-        <div className="rounded-3xl p-5 bg_light w-1/5">
+        <div className="text-center rounded-3xl p-5 bg_light w-1/5">
           <p className="text-3xl text-center font-medium pb-2 cl_gray">1 / 8</p>
-          <p className="text-xl text-center cl_pink font-bold bg_dark rounded-md p-1">
+          <button
+            onClick={handleStartGame}
+            className="text-xl text-center cl_pink font-bold bg_dark rounded-md p-1"
+          >
             START GAME
-          </p>
+          </button>
         </div>
         <div className="rounded-3xl p-5 bg_light w-2/5">
           <p className="text-lg font-normal my-3 cl_gray">
@@ -51,7 +86,7 @@ const Deck = () => {
         </div>
         <div className="rounded-3xl mt-5 px-5 py-3 bg_light w-full h-72">
           <p className="text-2xl mb-3 font-medium text-white">Players detail</p>
-          <div class="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div className="flex justify-between items-center bg-zinc-800 px-3 py-2 rounded-lg h-12">
               <p className="truncate">User1</p>
               <div className="flex gap-2 justify-between w-20">

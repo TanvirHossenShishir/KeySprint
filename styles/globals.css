@@ -16,6 +16,31 @@
   background-color: #303034;
 }
 
+
+.bg_gray {
+  background-color: #d1d0d4;
+}
+
+.bg_pink {
+  background-color: #ED6A5E;
+}
+
+.bg_orange {
+  background-color: #fb932c;
+}
+
+.bg_blue {
+  background-color: #3b82f6;
+}
+
+.bg_violet {
+  background-color: #8b5cf6;
+}
+
+.bg_teal {
+  background-color: #14b8a6;
+}
+
 .cl_gray {
   color: #d1d0d4;
 }
