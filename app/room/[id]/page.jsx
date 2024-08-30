@@ -1,15 +1,101 @@
 "use client";
 
+import { useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
 import Room from "../../../components/room";
-import { useState } from "react";
 
-const Deck = ({params}) => {
+const Deck = ({ params }) => {
   const [isGameStarted, setIsGameStarted] = useState(false);
-
-  // const getRoomID = () => "1";
+  const [socket, setSocket] = useState(null);
+  const socketInitialized = useRef(false);
+  const [username, setUsername] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [roomJoined, setRoomJoined] = useState(false);
 
   const [isPuncOn, setIsPuncOn] = useState(false);
   const [isNumbOn, setIsNumbOn] = useState(false);
+  const [users, setUsers] = useState([]); // State to store the list of users
+
+  useEffect(() => {
+    if (!socketInitialized.current) {
+      const socketInitializer = async () => {
+        await fetch("/api/socket/ioserver");
+        const newSocket = io();
+        setSocket(newSocket);
+
+        newSocket.on("connect", () => {
+          console.log("Socket connected:", newSocket.id);
+        });
+
+        newSocket.on("room-users", (users) => {
+          console.log("Users in the room:", users);
+          setUsers(users); // Update the users state with the list from the server
+        });
+
+        newSocket.on("disconnect", () => {
+          console.log("Socket disconnected");
+        });
+      };
+
+      socketInitializer();
+      socketInitialized.current = true;
+    }
+
+    const adjectives = [
+      "Bold",
+      "Swift",
+      "Wise",
+      "Cute",
+      "Fierce",
+      "Neat",
+      "Calm",
+      "Keen",
+      "Brave",
+      "Bright",
+    ];
+    const nouns = [
+      "Star",
+      "Wave",
+      "Fire",
+      "Lion",
+      "Moon",
+      "Rock",
+      "Bird",
+      "Tree",
+      "Cat",
+      "Wolf",
+    ];
+
+    const randomAdjective =
+      adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+    const randomUsername = `${randomAdjective}${randomNoun}`;
+    setUsername(randomUsername);
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket && !roomJoined) {
+      console.log("Joining room:", params.id);
+      socket.emit("join-room", params.id, username);
+      setRoomJoined(true);
+    }
+  }, [socket, params.id, username, roomJoined]);
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && inputValue.trim()) {
+      setUsername(inputValue.trim());
+    }
+  };
 
   const handlePunctuation = () => {
     setIsPuncOn(!isPuncOn);
@@ -26,7 +112,7 @@ const Deck = ({params}) => {
   return (
     <div className="bg_dark h-full px-28 py-5">
       {isGameStarted ? (
-        <Room roomID={params.id} />
+        <Room roomID={params.id} socket={socket} username={username} />
       ) : (
         <>
           <div className="flex text-white gap-5">
@@ -34,8 +120,11 @@ const Deck = ({params}) => {
               <div className="flex justify-center">
                 <p className="cl_gray text-lg pl-1 pr-3 py-1">You: </p>
                 <input
-                  placeholder="Enter your username..."
+                  placeholder={username}
                   className="text-lg bg-zinc-800 rounded-lg px-3 py-1 w-full focus:outline-none"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
 
@@ -66,16 +155,16 @@ const Deck = ({params}) => {
               </p>
               <button
                 onClick={handleStartGame}
-                className="text-xl text-center cl_pink font-bold bg_dark rounded-md p-1"
+                className="text-xl text-center cl_pink font-bold bg_dark rounded-lg py-1 px-3"
               >
                 START GAME
               </button>
             </div>
             <div className="rounded-3xl p-5 bg_light w-2/5">
-              <p className="text-lg font-normal my-3 cl_gray">
+              <p className="text-sm font-normal mt-3 cl_gray">
                 Share this link to invite your friends:
-                http://localhost:3000/room/b332yi
               </p>
+              <p className="text-xl">http://localhost:3000/room/{params.id}</p>
             </div>
           </div>
 
@@ -84,7 +173,7 @@ const Deck = ({params}) => {
               <p className="text-2xl mb-2 font-medium text-white">Chat</p>
 
               <div className="border mb-2 px-3 py-2 rounded-lg h-44 border-zinc-600">
-                User1 joined the room.
+                {username} joined the room.
               </div>
 
               <input
@@ -97,26 +186,24 @@ const Deck = ({params}) => {
                 Players detail
               </p>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex justify-between items-center bg-zinc-800 px-3 py-2 rounded-lg h-12">
-                  <p className="truncate">User1</p>
-                  <div className="flex gap-2 justify-between w-20">
-                    <div className="text-center">
-                      <p className="text-[12px] text-zinc-400">WPM</p>
-                      <p className="text-sm text-zinc-200">60</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[12px] text-zinc-400">ACCURACY</p>
-                      <p className="text-sm text-zinc-200">97%</p>
+                {users.map((user, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-zinc-800 px-3 py-2 rounded-lg h-12"
+                  >
+                    <p className="truncate">{user.username}</p>
+                    <div className="flex gap-2 justify-between w-20">
+                      <div className="text-center">
+                        <p className="text-[12px] text-zinc-400">WPM</p>
+                        <p className="text-sm text-zinc-200">60</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[12px] text-zinc-400">ACCURACY</p>
+                        <p className="text-sm text-zinc-200">97%</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
-                <div className="bg-zinc-800 p-3 rounded-lg h-12"></div>
+                ))}
               </div>
             </div>
           </div>

@@ -1,92 +1,32 @@
 "use client";
 
-let socket;
-import React, { useEffect, useState, useRef } from "react";
-import io from "socket.io-client";
+import React, { useState, useEffect } from "react";
 import { words } from "@/lib/words.json";
 
-const Room = ({ roomID }) => {
-  const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
-  const socketInitialized = useRef(false);
-  const [roomJoined, setRoomJoined] = useState(false);
+const Room = ({ roomID, socket, username }) => {
+  const [room, setRoom] = useState(roomID);
 
   useEffect(() => {
-    if (!socketInitialized.current) {
-      socketInitializer().then(() => {
-        if (roomID) {
-          setRoom(roomID);
-        }
-      });
-      socketInitialized.current = true;
-    }
-
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, []);
-
-  async function socketInitializer() {
-    if (socket) return;
-
-    await fetch("/api/socket/ioserver");
-    socket = io();
-
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-    });
-
-    socket.on("receive-message", (message) => {
-      console.log("Received message:", message);
-
-      const extractedCaretPositions = Object.values(message);
-      console.log("Extracted:", extractedCaretPositions);
-
-      setOtherCaretPositions(extractedCaretPositions);
-    });
-  }
-
-  useEffect(() => {
-    if (room && !roomJoined && socket) {
-      handleJoinRoom();
-    }
-  }, [room, socket]);
-
-  function handleJoinRoom() {
-    if (room && !roomJoined) {
-      console.log("Joining room:", room);
-      socket.emit("join-room", room, () => {
-        console.log("Room joined successfully");
-        setRoomJoined(true);
+    if (socket) {
+      socket.on("receive-message", (messages) => {
+        console.log("Received updated messages/caret positions:", messages);
+        const extractedCaretPositions = Object.values(messages);
+        setOtherCaretPositions(extractedCaretPositions);
       });
     }
-  }
+  }, [socket]);
 
-  const [connected, setConnected] = useState(false);
+
   const [userInput, setUserInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchingChars, setMatchingChars] = useState(0);
   const [matchingWords, setMatchingWords] = useState(0);
   const [isCharRight, setIsCharRight] = useState(true);
   const currentWord = words[currentIndex];
-  const [currentCaretPosition, setCurrentCaretPosition] = useState([0, 0]);
   const [otherCaretPositions, setOtherCaretPositions] = useState([
     [0, 0],
     [0, 0],
   ]);
-
-  useEffect(() => {
-    const adjectives = ["Happy", "Funny", "Sunny", "Silly", "Clever", "Brave"];
-    const nouns = ["Cat", "Dog", "Tiger", "Lion", "Elephant", "Kangaroo"];
-
-    const randomAdjective =
-      adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    const randomUsername = `${randomAdjective}${randomNoun}`;
-    setUsername(randomUsername);
-  }, []);
 
   const sendMessage = () => {
     const Message = {
@@ -149,7 +89,6 @@ const Room = ({ roomID }) => {
   };
 
   var isRoomValid = () => {
-    console.log(roomID);
     if (roomID >= "1" && roomID <= "9") {
       return true;
     } else return false;
