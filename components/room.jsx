@@ -88,16 +88,10 @@ const Room = ({ roomID, socket, username }) => {
     setIsInputFocused(false);
   };
 
-  var isRoomValid = () => {
-    if (roomID >= "1" && roomID <= "9") {
-      return true;
-    } else return false;
-  };
 
   return (
     <div className="flex justify-center items-start h-screen bg-neutral-200">
-      {isRoomValid() ? (
-        <div className="flex flex-wrap py-44 w-10/12">
+      <div className="flex flex-wrap py-44 w-10/12">
           {words.map((word, index) => {
             const isCurrentWord = index === currentIndex;
             const alreadyTyped = index < matchingWords;
@@ -160,9 +154,6 @@ const Room = ({ roomID, socket, username }) => {
             placeholder="Click here to start typing"
           />
         </div>
-      ) : (
-        <div>This is not a valid room.</div>
-      )}
     </div>
   );
 };
