@@ -11,10 +11,16 @@ const Deck = ({ params }) => {
   const [username, setUsername] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [roomJoined, setRoomJoined] = useState(false);
+  const [userActivity, setUserActivity] = useState([]);
+
 
   const [isPuncOn, setIsPuncOn] = useState(false);
   const [isNumbOn, setIsNumbOn] = useState(false);
-  const [users, setUsers] = useState([]); // State to store the list of users
+  const [users, setUsers] = useState([]);
+
+  const addActivity = (newActivity) => {
+    setUserActivity((prevActivities) => [...prevActivities, newActivity]);
+  };
 
   useEffect(() => {
     if (!socketInitialized.current) {
@@ -30,6 +36,15 @@ const Deck = ({ params }) => {
         newSocket.on("room-users", (users) => {
           console.log("Users in the room:", users);
           setUsers(users); // Update the users state with the list from the server
+        });
+
+        newSocket.on("user-joined", (newUser) => {
+          console.log("Users in the room:", newUser);
+          addActivity([newUser, "joined"]);
+        });
+
+        newSocket.on("user-left", (leftUser) => {
+          addActivity([leftUser, "left"]);
         });
 
         newSocket.on("disconnect", () => {
@@ -173,7 +188,11 @@ const Deck = ({ params }) => {
               <p className="text-2xl mb-2 font-medium text-white">Chat</p>
 
               <div className="border mb-2 px-3 py-2 rounded-lg h-44 border-zinc-600">
-                {username} joined the room.
+                {userActivity ? userActivity.map((pair, index) => (
+                  <p key={index} className="text-zinc-300">
+                    {pair[0]} has {pair[1]} the room.
+                  </p>
+                )) : <></>}
               </div>
 
               <input

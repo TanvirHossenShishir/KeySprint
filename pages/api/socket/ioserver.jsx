@@ -1,4 +1,19 @@
+import mongoose from "mongoose";
 import { Server } from "socket.io";
+
+await mongoose.connect(process.env.MONGODB_URI, {
+  dbName: "keysprintdb",
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const userSchema = new mongoose.Schema({
+  username: String,
+  socketId: String,
+  room: String,
+});
+
+const Participants = mongoose.model("Participants", userSchema);
 
 const allMessage = {};
 
@@ -15,24 +30,20 @@ export default function SocketHandler(req, res) {
   io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
 
-    socket.on("join-room", (room, username) => {
+    socket.on("join-room", async (room, username) => {
       socket.join(room);
       console.log(`Socket ${socket.id} joined room ${room} as ${username}`);
 
-      if (!allMessage[room]) {
-        allMessage[room] = { users: [] };
-      }
+      // Save user to database
+      const user = new Participants({ username, socketId: socket.id, room });
+      await user.save();
 
-      
-      allMessage[room].users.push({ username, socketId: socket.id });
-      console.log(
-        `User ${username} with Socket ID ${socket.id} joined room ${room}`
-      );
+      const usersInRoom = await Participants.find({ room });
 
-      
-      io.to(room).emit("room-users", allMessage[room].users);
-      console.log(`Users in room ${room}:`, allMessage[room].users);
+      io.to(room).emit("room-users", usersInRoom);
+      io.to(room).emit("user-joined", username);
     });
+
 
     socket.on("send-message", (obj) => {
       const { room } = obj;
@@ -41,7 +52,6 @@ export default function SocketHandler(req, res) {
       if (obj.Message) {
         const { userId, message } = obj.Message;
 
-        
         if (!allMessage[room]) {
           allMessage[room] = { users: [], messages: {} };
         }
@@ -66,24 +76,16 @@ export default function SocketHandler(req, res) {
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       console.log(`Client disconnected: ${socket.id}`);
 
-      for (const room in allMessage) {
-        if (allMessage.hasOwnProperty(room)) {
-          const userIndex = allMessage[room].users.findIndex(
-            (user) => user.socketId === socket.id
-          );
-
-          if (userIndex !== -1) {
-            const [removedUser] = allMessage[room].users.splice(userIndex, 1);
-            console.log(
-              `Removed user ${removedUser.username} with Socket ID ${socket.id} from room ${room}`
-            );
-
-            io.to(room).emit("room-users", allMessage[room].users);
-          }
-        }
+      const user = await Participants.findOneAndDelete({
+        socketId: socket.id,
+      });
+      if (user) {
+        const usersInRoom = await Participants.find({ room: user.room });
+        io.to(user.room).emit("room-users", usersInRoom);
+        io.to(user.room).emit("user-left", user.username);
       }
     });
   });
@@ -91,4 +93,3 @@ export default function SocketHandler(req, res) {
   console.log("Socket.io server set up");
   res.end();
 }
-
