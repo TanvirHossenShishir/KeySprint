@@ -188,7 +188,7 @@ const Deck = ({ params }) => {
                 </div>
                 <div className="text-center rounded-3xl p-5 bg_light w-1/5">
                   <p className="text-3xl text-center font-medium pb-2 cl_gray">
-                    1 / 8 {params.id}
+                    1 / 8
                   </p>
                   <button
                     onClick={handleStartGame}
