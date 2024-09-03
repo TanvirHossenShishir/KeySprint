@@ -10,22 +10,18 @@ const roomSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  users: [
-    {
-      username: {
-        type: String,
-        required: true,
-      },
-      joinedAt: {
-        type: Date,
-        default: Date.now,
-      },
+  owner: {
+    username: {
+      type: String,
+      default: null, 
     },
-  ],
-  // Add any other fields relevant to your application
+    joinedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
 });
 
-// Use the existing compiled model if it exists, otherwise create a new one
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);
 
 export default Room;
