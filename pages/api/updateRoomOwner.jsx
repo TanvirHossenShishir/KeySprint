@@ -6,6 +6,9 @@ export default async function handler(req, res) {
     await connectToDB();
     const { roomId, username } = req.body;
 
+    console.log(roomId);
+    console.log(username);
+
     try {
       const room = await Room.findOneAndUpdate(
         { roomId, "owner.username": null },
