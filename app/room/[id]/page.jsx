@@ -193,7 +193,7 @@ const Deck = ({ params }) => {
                   <p className="cl_gray text-lg pl-1 py-1">Mode: </p>
                   <button
                     onClick={handlePunctuation}
-                    className={`bg-zinc-800 text-xs px-2 rounded-lg ${
+                    className={`zoom bg-zinc-800 text-xs px-2 rounded-lg ${
                       isPuncOn ? "bg_blue" : "bg-zinc-800 cl_gray"
                     }`}
                   >
@@ -201,7 +201,7 @@ const Deck = ({ params }) => {
                   </button>
                   <button
                     onClick={handleNumber}
-                    className={`bg-zinc-800 text-xs px-2 rounded-lg ${
+                    className={`zoom bg-zinc-800 text-xs px-2 rounded-lg ${
                       isNumbOn ? "bg_blue" : "bg-zinc-800 cl_gray"
                     }`}
                   >
@@ -211,14 +211,14 @@ const Deck = ({ params }) => {
               </div>
               <div className="text-center rounded-3xl p-5 bg_light w-1/5">
                 <p className="text-3xl text-center font-medium pb-2 cl_gray">
-                  1 / 8
+                  {users.length} / 8
                 </p>
                 {isCountdownActive ? (
                   <div className="flex items-center justify-center gap-2 text-zinc-300"><p>Starts in </p><p className="cl_pink text-3xl text-center font-bold">{countdown}</p></div>
                 ) : isOwner ? (
                   <button
                     onClick={handleStartGame}
-                    className="text-xl text-center cl_pink font-bold bg_dark rounded-lg py-1 px-3"
+                    className="zoom text-xl text-center cl_pink font-bold bg_dark rounded-lg py-1 px-3"
                   >
                     START GAME
                   </button>

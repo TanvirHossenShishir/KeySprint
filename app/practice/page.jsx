@@ -88,21 +88,20 @@ const Room = ({ roomID, socket, username }) => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen">
-      <div className="flex bg_light mb-5 h-12 w-4/5 rounded-2xl text-white text-2xl justify-center items-center">60</div>
-      <div className="flex flex-wrap w-full p-3 rounded-3xl h-52 bg-[#303034]">
+    <div className="flex justify-center items-start h-screen bg-neutral-200">
+      <div className="flex flex-wrap py-44 w-10/12">
         {words.map((word, index) => {
           const isCurrentWord = index === currentIndex;
           const alreadyTyped = index < matchingWords;
           return (
-            <div className="p-1  w-fit flex text-zinc-500" key={index}>
+            <div className="p-1 h-12 w-fit flex text-neutral-500" key={index}>
               {word.split("").map((char, charIndex) => {
                 const isMatching = charIndex < matchingChars;
                 const isCaret = isCurrentWord && charIndex === matchingChars;
-                const charClassName = `relative flex items-center text-xl font-medium border-l-2  ${
+                const charClassName = `relative flex items-center text-xl font-medium border-l-2 ${
                   isCurrentWord || alreadyTyped
                     ? isMatching || alreadyTyped
-                      ? "text-zinc-300"
+                      ? "text-neutral-900"
                       : ""
                     : ""
                 } 
@@ -111,7 +110,7 @@ const Room = ({ roomID, socket, username }) => {
                       ? isCharRight
                         ? "border-yellow-500"
                         : "border-red-500"
-                      : "border-[#303034]"
+                      : ""
                   }
                 `;
 
@@ -143,7 +142,7 @@ const Room = ({ roomID, socket, username }) => {
         <input
           className={`${
             isInputFocused ? "opacity-0" : "opacity-0"
-          } w-10/12 h-96 absolute top-44 left-44 text-lg text-center placeholder-neutral-900`}
+          } w-10/12 h-72 absolute top-44 left-46 text-lg text-center placeholder-neutral-900`}
           type="text"
           value={userInput}
           onChange={handleChange}

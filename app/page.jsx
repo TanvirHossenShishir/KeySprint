@@ -31,14 +31,14 @@ const Home = () => {
   return (
     <div className="bg_dark h-screen px-28 py-5">
       <div className="flex text-center text-white gap-5 h-64">
-        <Link href="/room/9" className="flex-1 rounded-3xl pt-10 bg_light">
+        <Link href="/room/9" className="zoom flex-1 rounded-3xl pt-10 bg_light">
           <div className="flex justify-center text-6xl pb-3 cl_orange">
             <CgGym />
           </div>
           <p className="text-4xl font-medium">Solo Play</p>
           <p className="text-lg font-normal m-3 cl_gray">Play on your own</p>
         </Link>
-        <Link href="/" className="flex-1 rounded-3xl pt-10 bg_light">
+        <Link href="/" className="zoom flex-1 rounded-3xl pt-10 bg_light">
           <div className="flex justify-center text-6xl pb-3 cl_teal">
             <AiOutlineThunderbolt />
           </div>
@@ -47,7 +47,7 @@ const Home = () => {
         </Link>
         <div
           onClick={handleGroupPlay}
-          className="flex-1 rounded-3xl pt-10 bg_light cursor-pointer"
+          className="zoom flex-1 rounded-3xl pt-10 bg_light cursor-pointer"
         >
           <div className="flex justify-center text-6xl pb-3 cl_pink">
             <TiGroupOutline />

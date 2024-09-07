@@ -16,13 +16,12 @@
   background-color: #303034;
 }
 
-
 .bg_gray {
   background-color: #d1d0d4;
 }
 
 .bg_pink {
-  background-color: #ED6A5E;
+  background-color: #ed6a5e;
 }
 
 .bg_orange {
@@ -46,7 +45,7 @@
 }
 
 .cl_pink {
-  color: #ED6A5E;
+  color: #ed6a5e;
 }
 
 .cl_orange {
@@ -65,6 +64,13 @@
   color: #14b8a6;
 }
 
+.zoom {
+  transition: transform 0.5s ease;
+}
+
+.zoom:hover {
+  transform: scale(0.97);
+}
 
 .main {
   width: 100vw;
