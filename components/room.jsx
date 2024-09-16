@@ -5,8 +5,11 @@ import { words } from "@/lib/words.json";
 
 const Room = ({ roomID, socket, username }) => {
   const [room, setRoom] = useState(roomID);
+  const [timer, setTimer] = useState(0);
+  const [isTimerStarted, setIsTimerStarted] = useState(false);
 
   useEffect(() => {
+    setIsTimerStarted(true);
     if (socket) {
       socket.on("receive-message", (messages) => {
         console.log("Received updated messages/caret positions:", messages);
@@ -87,9 +90,32 @@ const Room = ({ roomID, socket, username }) => {
     setIsInputFocused(false);
   };
 
+  useEffect(() => {
+    let timerInterval;
+    if (isTimerStarted) {
+      timerInterval = setInterval(() => {
+        setTimer((prevTime) => prevTime + 1);
+      }, 1000); 
+    }
+
+    return () => clearInterval(timerInterval); 
+  }, [isTimerStarted]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
+  };
+
   return (
     <div className="flex flex-col items-center h-screen">
-      <div className="flex bg_light mb-5 h-12 w-4/5 rounded-2xl text-white text-2xl justify-center items-center">60</div>
+      <div className="flex bg_light mb-5 h-12 w-4/5 rounded-2xl justify-center items-center">
+        <div className="flex justify-center items-center p-4 h-full text-white text-4xl">
+          {formatTime(timer)}
+        </div>
+      </div>
       <div className="flex flex-wrap w-full p-3 rounded-3xl h-52 bg-[#303034]">
         {words.map((word, index) => {
           const isCurrentWord = index === currentIndex;
@@ -152,6 +178,31 @@ const Room = ({ roomID, socket, username }) => {
           onBlur={handleInputBlur}
           placeholder="Click here to start typing"
         />
+      </div>
+      <div className="mt-5 bg_dark w-full h-36">
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(5)].map((_, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center bg_light pr-3 rounded-lg h-12"
+            >
+            <div className="flex items-center gap-2">
+              <p className="flex justify-center items-center rounded-tl-lg rounded-bl-lg bg-red-600 text-white text-2xl h-12 w-8">{index + 1}</p>
+              <p className="truncate text-white">user</p>
+            </div>
+              <div className="flex gap-2 justify-between w-20">
+                <div className="text-center">
+                  <p className="text-[12px] text-zinc-400">WPM</p>
+                  <p className="text-sm text-white">{0}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[12px] text-zinc-400">ACC</p>
+                  <p className="text-sm text-white">{0}%</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

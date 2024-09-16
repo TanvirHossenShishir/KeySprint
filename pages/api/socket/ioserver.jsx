@@ -77,7 +77,7 @@ export default function SocketHandler(req, res) {
     });
 
     socket.on("start-countdown", (roomId) => {
-      io.to(roomId).emit("start-countdown", { countdown: 8 });
+      io.to(roomId).emit("start-countdown", { countdown: 3 });
     });
 
     socket.on("disconnect", async () => {

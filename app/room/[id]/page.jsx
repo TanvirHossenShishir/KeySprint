@@ -7,7 +7,7 @@ import Room from "../../../components/room";
 const Deck = ({ params }) => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(8); // Initial countdown value
+  const [countdown, setCountdown] = useState(0); 
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState(generateRandomUsername());
   const [inputValue, setInputValue] = useState("");
