@@ -7,7 +7,7 @@ import Room from "../../../components/room";
 const Deck = ({ params }) => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(0); 
+  const [countdown, setCountdown] = useState(3);
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState(generateRandomUsername());
   const [inputValue, setInputValue] = useState("");
@@ -19,6 +19,7 @@ const Deck = ({ params }) => {
   const [isValidRoom, setIsValidRoom] = useState(null);
   const [owner, setOwner] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
+  const [roomCode, setRoomCode] = useState(0);
 
   const socketInitialized = useRef(false);
 
@@ -72,6 +73,7 @@ const Deck = ({ params }) => {
     try {
       const response = await fetch(`/api/rooms/${params.id}`);
       const data = await response.json();
+      setRoomCode(sumOfAsciiChars(params.id));
       setIsValidRoom(data.exists);
     } catch (error) {
       console.error("Failed to check room validity:", error);
@@ -116,6 +118,14 @@ const Deck = ({ params }) => {
 
     return newSocket;
   };
+
+  function sumOfAsciiChars(str) {
+    let sum = 0;
+    for (let i = 0; i < str.length; i++) {
+      sum += str.charCodeAt(i);
+    }
+    return sum;
+  }
 
   useEffect(() => {
     initializeRoom();
@@ -214,7 +224,12 @@ const Deck = ({ params }) => {
                   {users.length} / 8
                 </p>
                 {isCountdownActive ? (
-                  <div className="flex items-center justify-center gap-2 text-zinc-300"><p>Starts in </p><p className="cl_pink text-3xl text-center font-bold">{countdown}</p></div>
+                  <div className="flex items-center justify-center gap-2 text-zinc-300">
+                    <p>Starts in </p>
+                    <p className="cl_pink text-3xl text-center font-bold">
+                      {countdown}
+                    </p>
+                  </div>
                 ) : isOwner ? (
                   <button
                     onClick={handleStartGame}
@@ -265,22 +280,25 @@ const Deck = ({ params }) => {
                 {users.map((user, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center bg-zinc-800 px-3 py-2 rounded-lg h-12"
+                    className="flex justify-between items-center bg-zinc-800 pr-3 rounded-lg h-12"
                   >
-                    <p className="truncate">
-                      {owner === user.username
-                        ? `${user.username}*`
-                        : user.username}
-                    </p>
-                    <div className="flex gap-2 justify-between w-20">
+                    <div className="flex items-center gap-2">
+                      <p className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${(roomCode + index) % 8} text-white text-2xl h-12 w-8`}></p>
+                      <p className="truncate">
+                        {owner === user.username
+                          ? `${user.username}*`
+                          : user.username}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 justify-between w-16">
                       <div className="text-center">
                         <p className="text-[12px] text-zinc-400">WPM</p>
-                        <p className="text-sm text-white">{user.wpm || 0}</p>
+                        <p className="text-sm text-white">{user.wpm || 100}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-[12px] text-zinc-400">ACC</p>
                         <p className="text-sm text-white">
-                          {user.accuracy || 0}%
+                          {user.accuracy || 100}%
                         </p>
                       </div>
                     </div>

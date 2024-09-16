@@ -64,6 +64,47 @@
   color: #14b8a6;
 }
 
+.cl_0 {
+  background-color: #FF37A6;
+  color: white;
+}
+
+.cl_1 {
+  background-color: #f6f956e9;
+  color: #212122;
+}
+
+.cl_2 {
+  background-color: #CC2936; 
+  color: white;
+}
+
+.cl_3 {
+  background-color: #2b8952; 
+  color: white;
+}
+
+.cl_4 {
+  background-color: #17BEBB;
+  color: #212122;
+}
+
+.cl_5 {
+  background-color: #6A5ACD;
+  color: white;
+}
+
+.cl_6 {
+  background-color: #ef5922; 
+  color: white;
+}
+
+.cl_7 {
+  background-color: #a8a99f;
+  color: #212122;
+}
+
+
 .zoom {
   transition: transform 0.5s ease;
 }

@@ -7,6 +7,7 @@ const Room = ({ roomID, socket, username }) => {
   const [room, setRoom] = useState(roomID);
   const [timer, setTimer] = useState(0);
   const [isTimerStarted, setIsTimerStarted] = useState(false);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     setIsTimerStarted(true);
@@ -16,6 +17,7 @@ const Room = ({ roomID, socket, username }) => {
         const extractedCaretPositions = Object.values(messages);
         setOtherCaretPositions(extractedCaretPositions);
       });
+      socket.on("room-users", setUsers);
     }
   }, [socket]);
 
@@ -95,10 +97,10 @@ const Room = ({ roomID, socket, username }) => {
     if (isTimerStarted) {
       timerInterval = setInterval(() => {
         setTimer((prevTime) => prevTime + 1);
-      }, 1000); 
+      }, 1000);
     }
 
-    return () => clearInterval(timerInterval); 
+    return () => clearInterval(timerInterval);
   }, [isTimerStarted]);
 
   const formatTime = (seconds) => {
@@ -108,6 +110,14 @@ const Room = ({ roomID, socket, username }) => {
       remainingSeconds
     ).padStart(2, "0")}`;
   };
+
+  function sumOfAsciiChars(str) {
+    let sum = 0;
+    for (let i = 0; i < str.length; i++) {
+      sum += str.charCodeAt(i);
+    }
+    return sum;
+  }
 
   return (
     <div className="flex flex-col items-center h-screen">
@@ -181,15 +191,21 @@ const Room = ({ roomID, socket, username }) => {
       </div>
       <div className="mt-5 bg_dark w-full h-36">
         <div className="grid grid-cols-4 gap-4">
-          {[...Array(5)].map((_, index) => (
+          {users.map((user, index) => (
             <div
               key={index}
               className="flex justify-between items-center bg_light pr-3 rounded-lg h-12"
             >
-            <div className="flex items-center gap-2">
-              <p className="flex justify-center items-center rounded-tl-lg rounded-bl-lg bg-red-600 text-white text-2xl h-12 w-8">{index + 1}</p>
-              <p className="truncate text-white">user</p>
-            </div>
+              <div className="flex items-center gap-2">
+                <p
+                  className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${
+                    (sumOfAsciiChars(roomID) + index) % 8
+                  } text-white text-2xl h-12 w-8`}
+                >
+                  {index + 1}
+                </p>
+                <p className="truncate text-white">{user.username}</p>
+              </div>
               <div className="flex gap-2 justify-between w-20">
                 <div className="text-center">
                   <p className="text-[12px] text-zinc-400">WPM</p>
@@ -204,6 +220,34 @@ const Room = ({ roomID, socket, username }) => {
           ))}
         </div>
       </div>
+
+      {/* <div className="grid grid-cols-2 gap-2">
+        {users.map((user, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center bg-zinc-800 pr-3 rounded-lg h-12"
+          >
+            <div className="flex items-center gap-2">
+              <p
+                className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${
+                  (index) % 8
+                } text-white text-2xl h-12 w-8`}
+              ></p>
+          
+            </div>
+            <div className="flex gap-2 justify-between w-16">
+              <div className="text-center">
+                <p className="text-[12px] text-zinc-400">WPM</p>
+                <p className="text-sm text-white">{user.wpm || 100}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[12px] text-zinc-400">ACC</p>
+                <p className="text-sm text-white">{user.accuracy || 100}%</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div> */}
     </div>
   );
 };
