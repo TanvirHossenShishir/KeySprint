@@ -199,7 +199,7 @@ const Room = ({ roomID, socket, username }) => {
               <div className="flex items-center gap-2">
                 <p
                   className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${
-                    (sumOfAsciiChars(roomID) + index) % 8
+                    (sumOfAsciiChars(roomID) + user.serial) % 8
                   } text-white text-2xl h-12 w-8`}
                 >
                   {index + 1}
@@ -220,34 +220,7 @@ const Room = ({ roomID, socket, username }) => {
           ))}
         </div>
       </div>
-
-      {/* <div className="grid grid-cols-2 gap-2">
-        {users.map((user, index) => (
-          <div
-            key={index}
-            className="flex justify-between items-center bg-zinc-800 pr-3 rounded-lg h-12"
-          >
-            <div className="flex items-center gap-2">
-              <p
-                className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${
-                  (index) % 8
-                } text-white text-2xl h-12 w-8`}
-              ></p>
-          
-            </div>
-            <div className="flex gap-2 justify-between w-16">
-              <div className="text-center">
-                <p className="text-[12px] text-zinc-400">WPM</p>
-                <p className="text-sm text-white">{user.wpm || 100}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-[12px] text-zinc-400">ACC</p>
-                <p className="text-sm text-white">{user.accuracy || 100}%</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div> */}
+      
     </div>
   );
 };

@@ -283,7 +283,7 @@ const Deck = ({ params }) => {
                     className="flex justify-between items-center bg-zinc-800 pr-3 rounded-lg h-12"
                   >
                     <div className="flex items-center gap-2">
-                      <p className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${(roomCode + index) % 8} text-white text-2xl h-12 w-8`}></p>
+                      <p className={`flex justify-center items-center rounded-tl-lg rounded-bl-lg cl_${(roomCode + user.serial) % 8} text-white text-2xl h-12 w-8`}></p>
                       <p className="truncate">
                         {owner === user.username
                           ? `${user.username}*`
