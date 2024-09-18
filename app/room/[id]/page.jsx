@@ -293,7 +293,7 @@ const Deck = ({ params }) => {
                     <div className="flex gap-2 justify-between w-16">
                       <div className="text-center">
                         <p className="text-[12px] text-zinc-400">WPM</p>
-                        <p className="text-sm text-white">{user.wpm || 100}</p>
+                        <p className="text-sm text-white">{user.wpm || 0}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-[12px] text-zinc-400">ACC</p>

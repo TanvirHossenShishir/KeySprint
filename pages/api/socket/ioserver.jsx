@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   socketId: String,
   room: String,
   serial: Number,
+  wpm: Number,
+  accuracy: Number,
 });
 
 const Participants = mongoose.model("Participants", userSchema);
@@ -36,21 +38,30 @@ export default function SocketHandler(req, res) {
       console.log(`Socket ${socket.id} joined room ${room} as ${username}`);
 
       if (!allMessage[room]) {
-        allMessage[room] = { users: [], messages: {}};
+        allMessage[room] = { users: [], messages: {} };
       }
-      
+
       const serial = allMessage[room].users.length;
       console.log(serial);
-      
-      const user = new Participants({ username, socketId: socket.id, room, serial });
+
+      const wpm = 0;
+      const accuracy = 100;
+
+      const user = new Participants({
+        username,
+        socketId: socket.id,
+        room,
+        serial,
+        wpm,
+        accuracy,
+      });
       await user.save();
 
       const usersInRoom = await Participants.find({ room });
       console.log(usersInRoom);
-      
-      allMessage[room].users.push({ username, socketId: socket.id, serial});
 
-      
+      allMessage[room].users.push({ username, socketId: socket.id, serial, wpm, accuracy });
+
       io.to(room).emit("room-users", allMessage[room].users);
       console.log(allMessage[room].users);
       io.to(room).emit("user-joined", username);
@@ -61,32 +72,40 @@ export default function SocketHandler(req, res) {
       console.log("Received send-message event:", obj);
 
       if (obj.Message) {
-        const { userId, message } = obj.Message;
+        const { userId, message, wpm, accuracy } = obj.Message;
 
-        
         if (!allMessage[room]) {
-          allMessage[room] = { users: [], messages: {} };
+          console.warn(`Room ${room} does not exist.`);
+          return;
         }
 
-        
+        const existingUser = allMessage[room].users.find(
+          (user) => String(user.username) === String(userId)
+        );
+
+        if (!existingUser) {
+          console.log(`User with userId ${userId} not found in room ${room}.`);
+          return;
+        }
+
         allMessage[room].messages[userId] = message;
 
+        existingUser.wpm = wpm;
+        existingUser.accuracy = accuracy;
+
+        console.log(
+          `Updated user ${userId} in room ${room} with WPM: ${wpm}, Accuracy: ${accuracy}`
+        );
         console.log(
           `Updated messages/caret positions for room ${room}:`,
           allMessage[room].messages
         );
 
-        console.log(allMessage[room].users);
-
         io.to(room).emit("room-users", allMessage[room].users);
-
-        
         io.to(room).emit("receive-message", allMessage[room].messages);
-      } else {
-        console.warn(
-          "Received message does not contain expected structure:",
-          obj
-        );
+      } 
+      else {
+        console.log("Received message does not contain expected structure:", obj);
       }
     });
 
@@ -97,23 +116,19 @@ export default function SocketHandler(req, res) {
     socket.on("disconnect", async () => {
       console.log(`Client disconnected: ${socket.id}`);
 
-      
       const user = await Participants.findOneAndDelete({
         socketId: socket.id,
       });
 
       if (user) {
-        
         if (allMessage[user.room]) {
           allMessage[user.room].users = allMessage[user.room].users.filter(
             (u) => u.socketId !== socket.id
           );
         }
 
-        
         // const usersInRoom = await Participants.find({ room: user.room });
 
-        
         io.to(user.room).emit("room-users", allMessage[user.room].users);
         io.to(user.room).emit("user-left", user.username);
       }
@@ -123,3 +138,5 @@ export default function SocketHandler(req, res) {
   console.log("Socket.io server set up");
   res.end();
 }
+
+

@@ -70,29 +70,31 @@
 }
 
 .cl_1 {
-  background-color: #f6f956e9;
-  color: #212122;
-}
-
-.cl_2 {
-  background-color: #CC2936; 
-  color: white;
-}
-
-.cl_3 {
   background-color: #2b8952; 
   color: white;
 }
 
+.cl_2 {
+  background-color: #f6f956e9;
+  color: #212122;
+}
+
+.cl_3 {
+  background-color: #6A5ACD;
+  color: white;
+}
+
 .cl_4 {
+  background-color: #CC2936; 
+  color: white;
+}
+
+
+.cl_5 {
   background-color: #17BEBB;
   color: #212122;
 }
 
-.cl_5 {
-  background-color: #6A5ACD;
-  color: white;
-}
 
 .cl_6 {
   background-color: #ef5922; 

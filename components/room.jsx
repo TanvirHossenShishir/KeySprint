@@ -32,10 +32,25 @@ const Room = ({ roomID, socket, username }) => {
     [0, 0],
   ]);
 
+  const calculateWPM = () => {
+    const minutes = timer / 60;
+    return minutes > 0 ? (matchingWords / minutes).toFixed(2) : 0;
+  };
+
+  const calculateAccuracy = () => {
+    const totalCharsTyped = userInput.length + matchingWords;
+    const correctCharsTyped = matchingChars + matchingWords;
+    return totalCharsTyped > 0
+      ? ((correctCharsTyped / totalCharsTyped) * 100).toFixed(0)
+      : 100;
+  };
+
   const sendMessage = () => {
     const Message = {
       userId: username,
       message: [currentIndex, matchingChars],
+      wpm: calculateWPM(),
+      accuracy: calculateAccuracy(),
     };
 
     if (socket) {
@@ -209,20 +224,21 @@ const Room = ({ roomID, socket, username }) => {
               <div className="flex gap-2 justify-between w-20">
                 <div className="text-center">
                   <p className="text-[12px] text-zinc-400">WPM</p>
-                  <p className="text-sm text-white">{0}</p>
+                  <p className="text-sm text-white">{user.wpm}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-[12px] text-zinc-400">ACC</p>
-                  <p className="text-sm text-white">{0}%</p>
+                  <p className="text-sm text-white">{user.accuracy}%</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      
     </div>
   );
 };
 
 export default Room;
+
+
