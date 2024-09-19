@@ -42,8 +42,7 @@ export default function SocketHandler(req, res) {
       }
 
       const serial = allMessage[room].users.length;
-      console.log(serial);
-
+      
       const wpm = 0;
       const accuracy = 100;
 

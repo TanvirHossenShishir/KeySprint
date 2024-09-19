@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { words } from "@/lib/words.json";
 
 const Room = ({ roomID, socket, username }) => {
@@ -8,6 +8,13 @@ const Room = ({ roomID, socket, username }) => {
   const [timer, setTimer] = useState(0);
   const [isTimerStarted, setIsTimerStarted] = useState(false);
   const [users, setUsers] = useState([]);
+  const timerRef = useRef(0);
+  const currentIndexRef = useRef(0);
+  const matchingCharsRef = useRef(0);
+  const correctCharCntRef = useRef(0);
+  const wrongCharCntRef = useRef(0);
+  const matchingWordsRef = useRef(0);
+  const userInputRef = useRef("");
 
   useEffect(() => {
     setIsTimerStarted(true);
@@ -22,33 +29,29 @@ const Room = ({ roomID, socket, username }) => {
   }, [socket]);
 
   const [userInput, setUserInput] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [matchingChars, setMatchingChars] = useState(0);
-  const [matchingWords, setMatchingWords] = useState(0);
   const [isCharRight, setIsCharRight] = useState(true);
-  const currentWord = words[currentIndex];
+  const currentWord = words[currentIndexRef.current];
   const [otherCaretPositions, setOtherCaretPositions] = useState([
     [0, 0],
     [0, 0],
   ]);
 
   const calculateWPM = () => {
-    const minutes = timer / 60;
-    return minutes > 0 ? (matchingWords / minutes).toFixed(2) : 0;
+    const minutes = timerRef.current / 60;
+    return minutes > 0 ? (matchingWordsRef.current / minutes).toFixed(2) : 0;
   };
 
   const calculateAccuracy = () => {
-    const totalCharsTyped = userInput.length + matchingWords;
-    const correctCharsTyped = matchingChars + matchingWords;
+    const totalCharsTyped = correctCharCntRef.current + wrongCharCntRef.current;
     return totalCharsTyped > 0
-      ? ((correctCharsTyped / totalCharsTyped) * 100).toFixed(0)
+      ? ((correctCharCntRef.current / totalCharsTyped) * 100).toFixed(0)
       : 100;
   };
 
   const sendMessage = () => {
     const Message = {
       userId: username,
-      message: [currentIndex, matchingChars],
+      message: [currentIndexRef.current, matchingCharsRef.current],
       wpm: calculateWPM(),
       accuracy: calculateAccuracy(),
     };
@@ -64,37 +67,42 @@ const Room = ({ roomID, socket, username }) => {
   const handleKeyDown = (event) => {
     if (event.key === "Backspace") {
       event.preventDefault();
-
-      setMatchingChars((prevMatchingChars) =>
-        Math.max(0, prevMatchingChars - 1)
-      );
-
-      setUserInput((prevUserInput) => prevUserInput.slice(0, -1));
-
+      matchingCharsRef.current = Math.max(0, matchingCharsRef.current - 1);
+      userInputRef.current = userInputRef.current.slice(0, -1);
+      setUserInput(userInputRef.current); 
       setIsCharRight(true);
     }
-    sendMessage();
+    sendMessage(); 
   };
 
   const handleChange = (event) => {
     const value = event.target.value;
 
-    if (value[matchingChars] === currentWord[matchingChars]) {
-      setMatchingChars((prevMatchingChars) => prevMatchingChars + 1);
-      setUserInput(value);
+    if (
+      value[matchingCharsRef.current] ===
+      words[currentIndexRef.current][matchingCharsRef.current]
+    ) {
+      matchingCharsRef.current += 1;
+      correctCharCntRef.current += 1;
+      userInputRef.current = value;
+      setUserInput(userInputRef.current); 
       setIsCharRight(true);
-    } else {
+    } 
+    else {
       setIsCharRight(false);
+      wrongCharCntRef.current += 1;
       return;
     }
 
-    if (value === currentWord) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-      setUserInput("");
-      setMatchingChars(0);
-      setMatchingWords((prevMatchingWords) => prevMatchingWords + 1);
+    if (value === words[currentIndexRef.current]) {
+      currentIndexRef.current += 1;
+      matchingWordsRef.current += 1;
+      matchingCharsRef.current = 0;
+      userInputRef.current = "";
+      setUserInput(""); 
     }
-    sendMessage();
+
+    sendMessage(); 
   };
 
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -108,15 +116,16 @@ const Room = ({ roomID, socket, username }) => {
   };
 
   useEffect(() => {
-    let timerInterval;
     if (isTimerStarted) {
-      timerInterval = setInterval(() => {
-        setTimer((prevTime) => prevTime + 1);
+      const timerInterval = setInterval(() => {
+        timerRef.current += 1;
+        setTimer(timerRef.current); 
+        sendMessage();
       }, 1000);
-    }
 
-    return () => clearInterval(timerInterval);
-  }, [isTimerStarted]);
+      return () => clearInterval(timerInterval);
+    }
+  }, [isTimerStarted, socket, room, username]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -143,13 +152,13 @@ const Room = ({ roomID, socket, username }) => {
       </div>
       <div className="flex flex-wrap w-full p-3 rounded-3xl h-52 bg-[#303034]">
         {words.map((word, index) => {
-          const isCurrentWord = index === currentIndex;
-          const alreadyTyped = index < matchingWords;
+          const isCurrentWord = index === currentIndexRef.current;
+          const alreadyTyped = index < matchingWordsRef.current;
           return (
             <div className="p-1  w-fit flex text-zinc-500" key={index}>
               {word.split("").map((char, charIndex) => {
-                const isMatching = charIndex < matchingChars;
-                const isCaret = isCurrentWord && charIndex === matchingChars;
+                const isMatching = charIndex < matchingCharsRef.current;
+                const isCaret = isCurrentWord && charIndex === matchingCharsRef.current;
                 const charClassName = `relative flex items-center text-xl font-medium border-l-2  ${
                   isCurrentWord || alreadyTyped
                     ? isMatching || alreadyTyped
@@ -240,5 +249,3 @@ const Room = ({ roomID, socket, username }) => {
 };
 
 export default Room;
-
-
