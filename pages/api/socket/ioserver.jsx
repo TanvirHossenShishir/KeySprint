@@ -88,9 +88,19 @@ export default function SocketHandler(req, res) {
         }
 
         allMessage[room].messages[userId] = message;
-
         existingUser.wpm = wpm;
         existingUser.accuracy = accuracy;
+
+        allMessage[room].users.sort((a, b) => {
+          const aMessage = allMessage[room].messages[a.username];
+          const bMessage = allMessage[room].messages[b.username];
+
+          if (aMessage[0] !== bMessage[0]) {
+            return bMessage[0] - aMessage[0]; 
+          }
+
+          return bMessage[1] - aMessage[1]; 
+        });
 
         console.log(
           `Updated user ${userId} in room ${room} with WPM: ${wpm}, Accuracy: ${accuracy}`

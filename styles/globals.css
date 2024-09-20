@@ -80,14 +80,14 @@
 }
 
 .cl_3 {
+  background-color: #CC2936; 
+  color: white;
+}
+.cl_4 {
   background-color: #6A5ACD;
   color: white;
 }
 
-.cl_4 {
-  background-color: #CC2936; 
-  color: white;
-}
 
 
 .cl_5 {
@@ -95,16 +95,16 @@
   color: #212122;
 }
 
-
 .cl_6 {
+  background-color: #a8a99f;
+  color: #212122;
+}
+
+.cl_7 {
   background-color: #ef5922; 
   color: white;
 }
 
-.cl_7 {
-  background-color: #a8a99f;
-  color: #212122;
-}
 
 
 .zoom {
