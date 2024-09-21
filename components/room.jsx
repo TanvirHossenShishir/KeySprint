@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { words } from "@/lib/words.json";
 
-const Room = ({ roomID, socket, username }) => {
+const Room = ({ roomID, socket, username, modePunc, modeNumb }) => {
   const [room, setRoom] = useState(roomID);
   const [timer, setTimer] = useState(0);
   const [isTimerStarted, setIsTimerStarted] = useState(false);
@@ -143,13 +143,77 @@ const Room = ({ roomID, socket, username }) => {
     return sum;
   }
 
+  const getRankSuffix = (rank) => {
+    if (rank % 10 === 1 && rank % 100 !== 11) {
+      return "st";
+    } else if (rank % 10 === 2 && rank % 100 !== 12) {
+      return "nd";
+    } else if (rank % 10 === 3 && rank % 100 !== 13) {
+      return "rd";
+    } else {
+      return "th";
+    }
+  };
+
+  const rank = users.findIndex((user) => user.username === username) + 1;
+
   return (
     <div className="flex flex-col items-center h-screen">
-      <div className="flex bg_light mb-5 h-12 w-4/5 rounded-2xl justify-center items-center">
-        <div className="flex justify-center items-center p-4 h-full text-white text-4xl">
+      <div className="flex bg_light mb-5 h-12 w-4/5 rounded-2xl justify-center items-center gap-4">
+        <div className="flex justify-center items-center">
+          <div className="text-[14px] pt-1 text-zinc-400 font-bold pr-2">
+            RANK:
+          </div>
+          <div className="text-lg text-yellow-500 font-bold">
+            {rank}{getRankSuffix(rank)}
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center">
+          <div className="text-[14px] pt-1 text-zinc-400 font-bold pr-2">
+            WPM:
+          </div>
+          <div className="text-lg text-yellow-500 font-bold">
+            {calculateWPM()}
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center">
+          <div className="text-[14px] pt-1 text-zinc-400 font-bold pr-2">
+            ACC:
+          </div>
+          <div className="text-lg text-yellow-500 font-bold">
+            {calculateAccuracy()}%
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center px-6 mx-4 text-white text-3xl border-x-2 border-zinc-500">
           {formatTime(timer)}
         </div>
+
+        <div className="flex justify-center items-center gap-3">
+          <div
+            className={`bg-zinc-800 text-[12px] font-bold rounded-xl px-3 py-1 ${
+              modePunc ? "bg-yellow-500" : "bg-zinc-800 cl_gray"
+            }`}
+          >
+            PUNCTUATION
+          </div>
+          <div
+            className={`bg-zinc-800  text-[12px] font-bold rounded-xl px-3 py-1 ${
+              modeNumb ? "bg-yellow-500" : "bg-zinc-800 cl_gray"
+            }`}
+          >
+            NUMBER
+          </div>
+          <button
+            className={`zoom text-[12px] font-bold rounded-xl px-3 py-1 bg-red-500 text-white`}
+          >
+            LEAVE
+          </button>
+        </div>
       </div>
+
       <div className="flex flex-wrap w-full p-3 rounded-3xl h-52 bg-[#303034]">
         {words.map((word, index) => {
           const isCurrentWord = index === currentIndexRef.current;
@@ -158,7 +222,8 @@ const Room = ({ roomID, socket, username }) => {
             <div className="p-1  w-fit flex text-zinc-500" key={index}>
               {word.split("").map((char, charIndex) => {
                 const isMatching = charIndex < matchingCharsRef.current;
-                const isCaret = isCurrentWord && charIndex === matchingCharsRef.current;
+                const isCaret =
+                  isCurrentWord && charIndex === matchingCharsRef.current;
                 const charClassName = `relative flex items-center text-xl font-medium border-l-2  ${
                   isCurrentWord || alreadyTyped
                     ? isMatching || alreadyTyped

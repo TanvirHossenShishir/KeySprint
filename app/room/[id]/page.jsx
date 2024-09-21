@@ -179,7 +179,7 @@ const Deck = ({ params }) => {
   return (
     <div className="bg_dark h-full px-28 py-5">
       {isGameStarted ? (
-        <Room roomID={params.id} socket={socket} username={username} />
+        <Room roomID={params.id} socket={socket} username={username} modePunc={isPuncOn} modeNumb={isNumbOn} />
       ) : (
         <>
           {isValidRoom === null ? (
