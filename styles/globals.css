@@ -105,6 +105,17 @@
   color: white;
 }
 
+.blinking-caret {
+  width: 2px;
+  height: 1.6rem;
+  animation: caret-blink 1s step-end infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
 
 
 .zoom {

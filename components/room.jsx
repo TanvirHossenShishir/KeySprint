@@ -23,6 +23,7 @@ const Room = ({ roomID, socket, username, modePunc, modeNumb }) => {
         console.log("Received updated messages/caret positions:", messages);
         const extractedCaretPositions = Object.values(messages);
         setOtherCaretPositions(extractedCaretPositions);
+        console.log("users: ", users);
       });
       socket.on("room-users", setUsers);
     }
@@ -224,21 +225,13 @@ const Room = ({ roomID, socket, username, modePunc, modeNumb }) => {
                 const isMatching = charIndex < matchingCharsRef.current;
                 const isCaret =
                   isCurrentWord && charIndex === matchingCharsRef.current;
-                const charClassName = `relative flex items-center text-xl font-medium border-l-2  ${
+                const charClassName = `relative flex items-center text-xl font-medium border-l-2 border-[#303034] ${
                   isCurrentWord || alreadyTyped
                     ? isMatching || alreadyTyped
                       ? "text-zinc-300"
                       : ""
                     : ""
-                } 
-                  ${
-                    isCaret
-                      ? isCharRight
-                        ? "border-yellow-500"
-                        : "border-red-500"
-                      : "border-[#303034]"
-                  }
-                `;
+                }`;
 
                 const hasOtherCaret =
                   otherCaretPositions.find((pos) => {
@@ -252,9 +245,17 @@ const Room = ({ roomID, socket, username, modePunc, modeNumb }) => {
                 return (
                   <div className={charClassName} key={charIndex}>
                     {hasOtherCaret && (
-                      <div className="text-red-500 text-2xl absolute -top-3 -left-2 rotate-180">
-                        ^
-                      </div>
+                      <div className="w-3 h-3 bg-red-500 rounded-full absolute -top-1.5 -left-3"></div>
+                    )}
+
+                    {isCaret ? (
+                      isCharRight ? (
+                        <span className="blinking-caret absolute -left-0.5 top-2 bg-yellow-500"></span>
+                      ) : (
+                        <span className="blinking-caret absolute -left-0.5 top-2 bg-red-500"></span>
+                      )
+                    ) : (
+                      <></>
                     )}
 
                     {char}
